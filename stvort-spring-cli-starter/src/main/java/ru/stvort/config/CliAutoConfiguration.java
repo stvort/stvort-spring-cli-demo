@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import ru.stvort.handlers.CliCommandExecutor;
 import ru.stvort.handlers.CliCommandHandlersRegistrationPostProcessor;
 import ru.stvort.io.*;
 import ru.stvort.handlers.CliCommandsHandlerImpl;
@@ -47,8 +48,13 @@ public class CliAutoConfiguration {
     }
 
     @Bean
+    public CliCommandExecutor cliCommandExecutor() {
+        return new CliCommandExecutor();
+    }
+
+    @Bean
     public CliCommandsHandlerImpl cliCommandHandler() {
-        return new CliCommandsHandlerImpl(commandLineParser());
+        return new CliCommandsHandlerImpl(commandLineParser(), cliCommandExecutor());
     }
 
     @Bean

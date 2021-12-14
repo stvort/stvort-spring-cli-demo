@@ -15,10 +15,12 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
     private final Log logger = LogFactory.getLog(getClass());
 
     private final CommandLineParser parser;
+    private final CliCommandExecutor cliCommandExecutor;
     private final Map<String, CliCommandMetaData> commandsMetaDataMap;
 
-    public CliCommandsHandlerImpl(CommandLineParser parser) {
+    public CliCommandsHandlerImpl(CommandLineParser parser, CliCommandExecutor cliCommandExecutor) {
         this.parser = parser;
+        this.cliCommandExecutor = cliCommandExecutor;
         commandsMetaDataMap = new HashMap<>();
     }
 
@@ -34,7 +36,8 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
         }
 
         var metaData = commandsMetaDataMap.get(parts.get(0));
-        return invokeCommand(metaData, (parts.size() == 1)? List.of(): parts.subList(1, parts.size()));
+        List<String> commandArgs = (parts.size() == 1)? List.of(): parts.subList(1, parts.size());
+        return cliCommandExecutor.invokeCommandByMetaData(metaData, commandArgs);
     }
 
     @Override
@@ -46,34 +49,5 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
         commandsMetaDataMap.put(metaData.getCommand(), metaData);
     }
 
-    private Object invokeCommand(CliCommandMetaData metaData, List<String> args) {
-        var commandArgs = prepareCommandArgsValues(metaData, args);
-        try {
-            return metaData.getCommandMethod().invoke(metaData.getBeanInstance(), commandArgs);
-        } catch (Exception e) {
-            throw new CliCommandInvocationException(String.format("Ошибка в процессе выполнения команды %s",
-                    metaData.getCommand()));
-        }
-    }
 
-    private Object[] prepareCommandArgsValues(CliCommandMetaData metaData, List<String> args) {
-        // TODO: Заменить хардкод на список конвертеров
-        var paramsTypes = metaData.getCommandMethod().getParameterTypes();
-        if (paramsTypes.length > args.size()) {
-            throw new IllegalArgumentException("Передано недостаточное количество аргументов");
-        }
-
-        var commandArgs = new Object[paramsTypes.length];
-        for (int i = 0; i < paramsTypes.length; i++) {
-            if (paramsTypes[i].equals(String.class)) {
-                commandArgs[i] = args.get(i);
-            } else if (paramsTypes[i].equals(Integer.class) || paramsTypes[i].equals(int.class)) {
-                commandArgs[i] = Integer.valueOf(args.get(i));
-            } else {
-                throw new UnsupportedArgumentTypeException(String.format("Аргументы типа %s не поддерживаются",
-                        paramsTypes[i]));
-            }
-        }
-        return commandArgs;
-    }
 }
