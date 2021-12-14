@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public class MenuLoop {
 
-    private static final String DEFAULT_PROMPT = "Наверное это мой промпт>";
-    private static final String DEFAULT_ERROR_MESSAGE = "Ошибка при обработке команды";
-    public static final String EXIT_COMMAND = "exit";
+    static final String DEFAULT_ERROR_MESSAGE = "Ошибка при обработке команды";
+    static final String DEFAULT_PROMPT = "Наверное это мой промпт>";
+    static final String EXIT_COMMAND = "exit";
 
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -48,7 +48,7 @@ public class MenuLoop {
                 var res = cliCommandsHandler.handle(commandLine);
                 io.printlnString(String.valueOf(res));
             } catch (Exception e) {
-                e.printStackTrace();
+                printError(e);
             }
         }
 
@@ -75,9 +75,10 @@ public class MenuLoop {
         io.printString(prompt);
     }
 
-    private void printError() {
+    private void printError(Exception e) {
         var errorMessageProvider = messageProviders.get(MenuMessageTypes.ERROR);
         var errorMessage = errorMessageProvider == null? DEFAULT_ERROR_MESSAGE: errorMessageProvider.getMessage();
-        io.printString(errorMessage);
+        io.printlnString(errorMessage);
+        io.printlnString(e.getMessage());
     }
 }
