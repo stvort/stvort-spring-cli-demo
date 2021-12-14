@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class CommandLineParserImpl implements CommandLineParser {
 
-    private static final Pattern PATTERN = Pattern.compile("\"(\\\\+\"|[^\"])*?\"|(\\\\\\s|[^\\s])+",
+    private static final Pattern PATTERN = Pattern.compile("[^\\s\"]+|\"([^\"]*(\\\\\")*[^\"]*)+[^\\\\]\"",
             Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     @Override
