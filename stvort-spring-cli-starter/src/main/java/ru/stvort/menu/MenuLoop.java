@@ -40,7 +40,7 @@ public class MenuLoop {
         while (true) {
             printPrompt();
             try {
-                String commandLine = io.inputString();
+                var commandLine = io.inputString();
 
                 if (commandLine.equals(EXIT_COMMAND)) {
                     break;

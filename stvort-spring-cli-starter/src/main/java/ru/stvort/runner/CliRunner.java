@@ -1,11 +1,8 @@
 package ru.stvort.runner;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
 import ru.stvort.menu.MenuLoop;
 
 public class CliRunner implements ApplicationRunner, Ordered {
@@ -19,7 +16,7 @@ public class CliRunner implements ApplicationRunner, Ordered {
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         menuLoop.startMenuLoop();
     }
 

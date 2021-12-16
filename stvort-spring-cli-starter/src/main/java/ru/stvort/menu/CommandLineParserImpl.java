@@ -12,8 +12,8 @@ public class CommandLineParserImpl implements CommandLineParser {
 
     @Override
     public List<String> parse(String commandLine) {
-        Matcher matcher = PATTERN.matcher(commandLine);
-        List<String> matches = new ArrayList<>();
+        var matcher = PATTERN.matcher(commandLine);
+        var matches = new ArrayList<String>();
         while (matcher.find()) {
             var arg = matcher.group();
             if (arg.startsWith("\"") && arg.endsWith("\"")) {

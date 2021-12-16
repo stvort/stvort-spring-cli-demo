@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import ru.stvort.handlers.exceptions.*;
 import ru.stvort.menu.CommandLineParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
 
     @Override
     public Object handle(String commandLine) {
-        List<String> parts = parser.parse(commandLine);
+        var parts = parser.parse(commandLine);
         if (parts.isEmpty()) {
             throw new EmptyCliCommandException();
         }
@@ -36,7 +37,7 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
         }
 
         var metaData = commandsMetaDataMap.get(parts.get(0));
-        List<String> commandArgs = (parts.size() == 1)? List.of(): parts.subList(1, parts.size());
+        var commandArgs = (parts.size() == 1)? new ArrayList<String>() : parts.subList(1, parts.size());
         return cliCommandExecutor.invokeCommandByMetaData(metaData, commandArgs);
     }
 
