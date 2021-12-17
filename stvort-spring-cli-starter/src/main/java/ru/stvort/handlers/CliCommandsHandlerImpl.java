@@ -27,17 +27,14 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
 
     @Override
     public Object handle(String commandLine) {
-        var parts = parser.parse(commandLine);
-        if (parts.isEmpty()) {
-            throw new EmptyCliCommandException();
-        }
+        var commandLineParts = parser.parse(commandLine);
+        checkCommandLinePartsSize(commandLineParts);
 
-        if (!commandsMetaDataMap.containsKey(parts.get(0))) {
-            throw new CliCommandNotFoundException(String.format("Команда %s не зарегистрирована", parts.get(0)));
-        }
+        var commandName = extractCommandName(commandLineParts);
+        checkCommandRegistered(commandName);
 
-        var metaData = commandsMetaDataMap.get(parts.get(0));
-        var commandArgs = (parts.size() == 1)? new ArrayList<String>() : parts.subList(1, parts.size());
+        var metaData = commandsMetaDataMap.get(commandName);
+        var commandArgs = extractCommandArgs(commandLineParts);
         return cliCommandExecutor.invokeCommandByMetaData(metaData, commandArgs);
     }
 
@@ -50,5 +47,26 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
         commandsMetaDataMap.put(metaData.getCommand(), metaData);
     }
 
+    private void checkCommandLinePartsSize(List<String> commandLineParts){
+        if (commandLineParts.isEmpty()) {
+            throw new EmptyCliCommandException();
+        }
+    }
+
+    private String extractCommandName(List<String> commandLineParts){
+        return commandLineParts.get(0);
+    }
+
+    private void checkCommandRegistered(String commandName){
+        if (!commandsMetaDataMap.containsKey(commandName)) {
+            throw new CliCommandNotFoundException(String.format("Команда %s не зарегистрирована", commandName));
+        }
+    }
+
+    private List<String> extractCommandArgs(List<String> commandLineParts){
+        return (commandLineParts.size() == 1)?
+                new ArrayList<>() :
+                commandLineParts.subList(1, commandLineParts.size());
+    }
 
 }
