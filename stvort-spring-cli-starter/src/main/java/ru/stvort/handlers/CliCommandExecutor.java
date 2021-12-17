@@ -22,7 +22,7 @@ public class CliCommandExecutor {
             return metaData.getCommandMethod().invoke(metaData.getBeanInstance(), commandArgs);
         } catch (Exception e) {
             throw new CliCommandInvocationException(String.format("Ошибка в процессе выполнения команды %s",
-                    metaData.getCommand()));
+                    metaData.getCommand()), e);
         }
     }
 
@@ -47,13 +47,17 @@ public class CliCommandExecutor {
 
     private void initDefaultTransformers(){
         defaultTransformers.put(String.class, String::valueOf);
-        defaultTransformers.put(byte.class, Integer::valueOf);
-        defaultTransformers.put(short.class, Integer::valueOf);
+        defaultTransformers.put(byte.class, Byte::valueOf);
+        defaultTransformers.put(short.class, Short::valueOf);
         defaultTransformers.put(int.class, Integer::valueOf);
-        defaultTransformers.put(long.class, Integer::valueOf);
-        defaultTransformers.put(Byte.class, Integer::valueOf);
-        defaultTransformers.put(Short.class, Integer::valueOf);
+        defaultTransformers.put(long.class, Long::valueOf);
+        defaultTransformers.put(boolean.class, Boolean::valueOf);
+
+        defaultTransformers.put(Byte.class, Byte::valueOf);
+        defaultTransformers.put(Short.class, Short::valueOf);
         defaultTransformers.put(Integer.class, Integer::valueOf);
-        defaultTransformers.put(Long.class, Integer::valueOf);
+        defaultTransformers.put(Long.class, Long::valueOf);
+        defaultTransformers.put(Boolean.class, Boolean::valueOf);
+
     }
 }
