@@ -3,6 +3,7 @@ package ru.stvort.io;
 import java.io.InputStream;
 import java.util.Scanner;
 
+
 public class CliInputOutputWorkerImpl implements CliInputOutputWorker {
 
     private final CliInputStreamProvider inputStreamProvider;
