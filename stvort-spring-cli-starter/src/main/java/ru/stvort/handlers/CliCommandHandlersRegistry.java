@@ -12,6 +12,7 @@ package ru.stvort.handlers;
  */
 public interface CliCommandHandlersRegistry {
     /**
+     * Register metadata of command
      * @param metaData - command line commands metadata to register
      * @see ru.stvort.handlers.CliCommandMetaData
      */

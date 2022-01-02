@@ -13,6 +13,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Main cycle of command line menu
+ * @author Alxander Orudzhev
+ */
 public class MenuLoop {
 
     static final String DEFAULT_ERROR_MESSAGE = "Ошибка при обработке команды";
@@ -34,6 +38,9 @@ public class MenuLoop {
                 .collect(Collectors.toMap(MenuMessageProvider::getType, Function.identity()));
     }
 
+    /**
+     * Starts main cycle of command line menu
+    */
     public void startMenuLoop(){
         printGreeting();
 

@@ -11,6 +11,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class containing logic for processing commands represented as a string
+ * That class transform command line to command metadata and args list with
+ * {@link ru.stvort.menu.CommandLineParser} and then dispatch command to it
+ * handlers endpoints using {@link ru.stvort.handlers.CliCommandExecutor}
+ *
+ * @author Alxander Orudzhev
+ *
+ * @see ru.stvort.handlers.CliCommandHandlersRegistry
+ * @see ru.stvort.handlers.CliCommandsHandler
+ * @see ru.stvort.menu.CommandLineParser
+ * @see ru.stvort.handlers.CliCommandExecutor
+ * @see ru.stvort.handlers.CliCommandMetaData
+ */
 public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCommandsHandler {
 
     private final Log logger = LogFactory.getLog(getClass());
@@ -25,6 +39,13 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
         commandsMetaDataMap = new HashMap<>();
     }
 
+    /**
+     * Handle (execute) given command and return it result if necessary
+     * @param commandLine - command line represented as a string
+     * @return result of command execution or {@code null} if command does not suggest a result
+     * @throws EmptyCliCommandException - if given command line is empty
+     * @throws CliCommandNotFoundException - if metadata for given command was not registered
+     */
     @Override
     public Object handle(String commandLine) {
         var commandLineParts = parser.parse(commandLine);
@@ -38,6 +59,11 @@ public class CliCommandsHandlerImpl implements CliCommandHandlersRegistry, CliCo
         return cliCommandExecutor.invokeCommandByMetaData(metaData, commandArgs);
     }
 
+    /**
+     * Register metadata of command in {@code commandsMetaDataMap}
+     * @param metaData - command line commands metadata to register
+     * @throws CliDuplicateCommandException if command with given alias already registered
+     */
     @Override
     public void registerCommand(CliCommandMetaData metaData) {
         if (commandsMetaDataMap.containsKey(metaData.getCommand())) {
