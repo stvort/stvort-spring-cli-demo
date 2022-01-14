@@ -1,17 +1,16 @@
 package ru.stvort.handlers;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import ru.stvort.handlers.transformers.DefaultArgsListTransformer;
+import ru.stvort.handlers.transformers.PlainTypeOneArgTransformer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Класс для выполнения команд должен ")
 class CliCommandExecutorTest {
@@ -20,7 +19,9 @@ class CliCommandExecutorTest {
     @ParameterizedTest
     @MethodSource("testParams")
     void shouldCorrectExecuteGivenCommand(CliCommandMetaData metaData, List<String> args, String expectedResult) {
-        var cliCommandExecutor = new CliCommandExecutor();
+        var plainTypeOneArgTransformer =  new PlainTypeOneArgTransformer();
+        var argsListTransformer = new DefaultArgsListTransformer(plainTypeOneArgTransformer);
+        var cliCommandExecutor = new CliCommandExecutor(plainTypeOneArgTransformer, List.of(argsListTransformer));
         Object actualResult = cliCommandExecutor.invokeCommandByMetaData(metaData, args);
         assertThat(actualResult.toString()).isEqualTo(expectedResult);
     }

@@ -6,11 +6,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
-import ru.stvort.handlers.CliCommandExecutor;
-import ru.stvort.handlers.CliCommandHandlersRegistrationPostProcessor;
+import ru.stvort.handlers.*;
+import ru.stvort.handlers.transformers.ArgsListTransformer;
+import ru.stvort.handlers.transformers.DefaultArgsListTransformer;
+import ru.stvort.handlers.transformers.PlainTypeOneArgTransformer;
 import ru.stvort.io.*;
-import ru.stvort.handlers.CliCommandsHandlerImpl;
 import ru.stvort.menu.CommandLineParser;
 import ru.stvort.menu.CommandLineParserImpl;
 import ru.stvort.menu.MenuLoop;
@@ -48,24 +50,36 @@ public class CliAutoConfiguration {
     }
 
     @Bean
-    public CliCommandExecutor cliCommandExecutor() {
-        return new CliCommandExecutor();
+    public PlainTypeOneArgTransformer plainTypeOneArgTransformer() {
+        return new PlainTypeOneArgTransformer();
     }
 
     @Bean
-    public CliCommandsHandlerImpl cliCommandHandler() {
-        return new CliCommandsHandlerImpl(commandLineParser(), cliCommandExecutor());
+    public DefaultArgsListTransformer defaultArgsListTransformer() {
+        return new DefaultArgsListTransformer(plainTypeOneArgTransformer());
     }
 
     @Bean
-    public CliCommandHandlersRegistrationPostProcessor cliCommandHandlersRegistrationPostProcessor(){
-        return new CliCommandHandlersRegistrationPostProcessor(cliCommandHandler());
+    public CliCommandExecutor cliCommandExecutor(List<ArgsListTransformer> argsListTransformers) {
+        return new CliCommandExecutor(plainTypeOneArgTransformer(), argsListTransformers);
     }
 
     @Bean
-    public MenuLoop menuLoop(@Autowired(required = false) List<MenuMessageProvider> messageProviders) {
+    public CliCommandsHandler cliCommandHandler(CliCommandExecutor cliCommandExecutor) {
+        return new CliCommandsHandlerImpl(commandLineParser(), cliCommandExecutor);
+    }
+
+    @DependsOn("cliCommandHandler")
+    @Bean
+    public CliCommandHandlersRegistrationPostProcessor cliCommandHandlersRegistrationPostProcessor(CliCommandHandlersRegistry registry){
+        return new CliCommandHandlersRegistrationPostProcessor(registry);
+    }
+
+    @Bean
+    public MenuLoop menuLoop(@Autowired(required = false) List<MenuMessageProvider> messageProviders,
+                             CliCommandsHandler cliCommandsHandler) {
         return new MenuLoop(cliInputOutputWorker(),
-                cliCommandHandler(),
+                cliCommandsHandler,
                 messageProviders == null? List.of(): messageProviders);
     }
 
